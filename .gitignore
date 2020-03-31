@@ -1,0 +1,6 @@
+/.vs
+/Serwer/Serwer/bin
+/Serwer/Serwer/obj
+*.exe
+*.sln
+*.csproj
