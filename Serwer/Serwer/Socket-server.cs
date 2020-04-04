@@ -24,9 +24,18 @@ namespace Serwer
         private IPAddress ipAddressServer;
         private int portServer;
         private IPEndPoint localEndPoint;
+        // Create a TCP/IP socket.  
         private Socket listener;
+        // Data buffer for incoming data.  
         private byte[] bytes = new byte[1024];
 
+        public Socket_server()
+        {
+            setIPEndPointForServer();
+            associatedWithEndpoint();
+            waitingForTheConnection();
+            Console.WriteLine("Połączenie zakończone");
+        }
 
         // creates an IPEndPoint for a server 
         // by combining the first IP address returned by Dns for the host computer 
@@ -35,21 +44,23 @@ namespace Serwer
         {
             String serverIpAddress = GetLocalIPAddress();
             ipAddressServer = IPAddress.Parse(serverIpAddress);
-            
+
             try
             {
                 Console.WriteLine("Wprowadz numer portu do nasluchu [1024, 65535]: ");
                 String portServerString = Console.ReadLine();
                 portServer = int.Parse(portServerString);
-            } catch (FormatException e)
+            }
+            catch (FormatException e)
             {
                 Console.WriteLine(e.Message);
-            } catch (ArgumentNullException e)
+            }
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine(e.Message);
             }
 
-            if(portServer < 1024 || portServer > 65535)
+            if (portServer < 1024 || portServer > 65535)
             {
                 throw new Exception("Port serwera moze zawierac sie tylko w przedziale [1024, 65535]");
             }
@@ -73,29 +84,16 @@ namespace Serwer
             listener.Listen(100);
         }
 
-        // To receive data from a network device, 
-        // pass a buffer to one of the Socket class's receive-data methods (Receive and ReceiveFrom).
-        // The Receive method returns the number of bytes received from the network.
-        public int receiveText()
-        {
-            byte[] bytes = new byte[1024];
-            int bytesRec = listener.Receive(bytes);
-            Console.WriteLine("Echoed text = {0}", Encoding.ASCII.GetString(bytes, 0, bytesRec));
-
-            closeConnection(listener);
-            // The Receive method returns the number of bytes received from the network.
-            return bytesRec;
-        }
-
+        // start lisening for the connection
         public void waitingForTheConnection()
         {
             Console.WriteLine("Waiting for a connection...");
+            // Program is suspended while waiting for an incoming connection.  
             Socket handler = listener.Accept();
             String data = null;
 
             while (true)
             {
-                bytes = new byte[1024];
                 int bytesRec = handler.Receive(bytes);
                 data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
                 if (data.IndexOf("<EOF>") > -1)
@@ -106,10 +104,10 @@ namespace Serwer
 
             Console.WriteLine("Text received : {0}", data);
 
-            byte[] msg = Encoding.ASCII.GetBytes(data);
-            handler.Send(msg);
-            handler.Shutdown(SocketShutdown.Both);
-            handler.Close();
+            // Echo the data back to the client.
+            //byte[] msg = Encoding.ASCII.GetBytes(data);
+            //handler.Send(msg);
+            closeConnection(handler);
         }
 
         private void closeConnection(Socket s)
@@ -123,6 +121,7 @@ namespace Serwer
         private static string GetLocalIPAddress()
         {
             /*
+             * https://stackoverflow.com/questions/6803073/get-local-ip-address
              * You can disregard the Ethernet adapter by its name. 
              * As the VM Ethernet adapter is represented by a valid NIC driver, 
              * it is fully equivalent to the physical NIC of your machine from the OS's point of view.
