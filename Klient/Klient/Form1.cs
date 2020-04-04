@@ -15,11 +15,11 @@ namespace Klient
 {
     public partial class Form1 : Form
     {
+        private string fileName;
+
         public Form1()
         {
             InitializeComponent();
-            //client.setIPEndPointForClient();
-            //client.connectToRemoteDevice();
         }
 
         private void buttonSendFile_Click(object sender, EventArgs e)
@@ -48,33 +48,24 @@ namespace Klient
                     Thread newThread;
                     Socket_client socketClient = new Socket_client();
 
-                    newThread = new Thread(() => socketClient.startClient(getIPText, getPortText));
+                    newThread = new Thread(() => socketClient.startClient(getIPText, getPortText, fileName));
                     newThread.Start();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Source + ex.ToString());
+                MessageBox.Show(ex.Source + ex.ToString());
             }
+        }
 
-
-            //int size = -1;
-            //DialogResult result = openFileDialog.ShowDialog(); // Show the dialog.
-            //if (result == DialogResult.OK) // Test result.
-            //{
-            //    string file = openFileDialog.FileName;
-            //    try
-            //    {
-            //        string text = File.ReadAllText(file);
-            //        size = text.Length;
-            //    }
-            //    catch (IOException)
-            //    {
-            //    }
-            //}
-            //Console.WriteLine(size); // <-- Shows file size in debugging mode.
-            //Console.WriteLine(result); // <-- For debugging use.
-            //textBox_TextToSend.Text = openFileDialog.FileName;
+        private void buttonWybierzPlik_Click(object sender, EventArgs e)
+        {
+            DialogResult result = openFileDialog.ShowDialog(); // Show the dialog.
+            if (result == DialogResult.OK) // Test result.
+            {
+                fileName = openFileDialog.FileName;
+                fileName = fileName.Replace("\\", "\\\\");  
+            }
         }
     }
 }

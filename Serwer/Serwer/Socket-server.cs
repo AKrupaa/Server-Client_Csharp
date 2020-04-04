@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -35,14 +36,7 @@ namespace Serwer
 
         public void startServer(String portInputed)
         {
-            try
-            {
-                setIPEndPointForServer(portInputed);
-            } catch(Exception e)
-            {
-                Console.WriteLine(e.Source + e.Message);
-            }
-            
+            setIPEndPointForServer(portInputed);
         }
 
         // creates an IPEndPoint for a server 
@@ -124,30 +118,53 @@ namespace Serwer
             {
                 Socket handler = listener.Accept();
                 String data = null;
-                // Data buffer for incoming data.  
-                byte[] bytes = new byte[1024];
 
+
+                // tu zdobywam rozmiar przychodzacego pliku
                 while (true)
                 {
+                    // Data buffer for incoming data.  
+                    byte[] bytes = new byte[1024];
+                    // liczba bitow otrzymanych
                     int bytesRec = handler.Receive(bytes);
                     data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    if (data.IndexOf("<EOF>") > -1)
+                    if (data.IndexOf("KONIEC") > -1)
                     {
                         break;
                     }
                 }
+                // rozmiar pliku, ktory otrzymamy bez wyrazenia KONIEC
+                int rozmiarPlikuDoOtrzymania = int.Parse(data.Substring(0, data.Length - 6));
+                // utworz taki buffer na dane
+                byte[] bytesZawierajacyPlik = new byte[rozmiarPlikuDoOtrzymania];
+                // otrzymaj dane
+                int otrzymanyRozmiar = handler.Receive(bytesZawierajacyPlik);
 
-                Console.WriteLine("Text received : {0}", data);
+                // miejscwe na: nazwa pliku + rozszerzenie
+                string stringNazwaPlikuZRozszerzeniem;
+                byte[] bytesNazwaPlikuZRozszerzeniem = new byte[250];
+                int rozmiarNazwaPlikuZRozszerzeniem;
 
-                // Echo the data back to the client.
-                //byte[] msg = Encoding.ASCII.GetBytes(data);
-                //handler.Send(msg);
-                //closeConnection(listener);
+                rozmiarNazwaPlikuZRozszerzeniem = handler.Receive(bytesNazwaPlikuZRozszerzeniem);
+                stringNazwaPlikuZRozszerzeniem = Encoding.ASCII.GetString(bytesNazwaPlikuZRozszerzeniem);
+
+                // jak nie ma rozszerzenia
+                if (stringNazwaPlikuZRozszerzeniem.Length < 2)
+                    stringNazwaPlikuZRozszerzeniem = "nazwa.rozszerzenie";
+                // jest plik z rozszerzeniem (?)
+
+                // zapisz gdzies plik
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+                stringNazwaPlikuZRozszerzeniem = stringNazwaPlikuZRozszerzeniem.Trim('\0');
+
+                FileStream fs = File.Create(path + "\\\\" + stringNazwaPlikuZRozszerzeniem);
+                fs.Write(bytesZawierajacyPlik, 0, otrzymanyRozmiar);
+                fs.Close();
+
                 Console.WriteLine("Połączenie " + handler.LocalEndPoint + " zakończone");
                 closeConnection(handler);
                 listener.Close();
-                
-
             }
             catch (InvalidOperationException ioe)
             {
