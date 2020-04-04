@@ -66,6 +66,7 @@ namespace Serwer
             }
 
             localEndPoint = new IPEndPoint(ipAddressServer, portServer);
+            Console.WriteLine("Nasluchiwany jest: " + localEndPoint);
 
             //Console.WriteLine(localEndPoint);
         }

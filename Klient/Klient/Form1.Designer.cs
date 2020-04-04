@@ -42,6 +42,7 @@
             this.textBox_IPaddress.Name = "textBox_IPaddress";
             this.textBox_IPaddress.Size = new System.Drawing.Size(100, 22);
             this.textBox_IPaddress.TabIndex = 2;
+            this.textBox_IPaddress.TextChanged += new System.EventHandler(this.textBox_IPaddress_TextChanged);
             // 
             // textBox_Port
             // 
@@ -76,6 +77,7 @@
             this.button_SendText.TabIndex = 6;
             this.button_SendText.Text = "Send";
             this.button_SendText.UseVisualStyleBackColor = true;
+            this.button_SendText.Click += new System.EventHandler(this.button_SendText_Click);
             // 
             // openFileDialog
             // 
