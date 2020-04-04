@@ -1,8 +1,17 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.CompilerServices;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+
+
+/*
+ Aplikacja serwera ma być wykonana jako aplikacja konsolowa.
+ Ma umożliwiać konfigurację portu nasłuchu.
+ Ma umożliwić jednoczesną obsługę wielu połączeń (wielowątkowość!).
+ Odebrane pliki należy składować w wybranym folderze, zachowując rozszerzenie oryginału oraz dbając o brak duplikacji nazw.
+ */
 
 namespace Serwer
 {
@@ -12,7 +21,6 @@ namespace Serwer
         // and then wait for a client to connect to that port. 
         // for the server
 
-        private IPHostEntry ipHostInfo;
         private IPAddress ipAddressServer;
         private int portServer;
         private IPEndPoint localEndPoint;
@@ -25,9 +33,30 @@ namespace Serwer
         // with a port number chosen from the registered port numbers range.
         public void setIPEndPointForServer()
         {
-            this.ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            this.ipAddressServer = ipHostInfo.AddressList[0];
-            this.localEndPoint = new IPEndPoint(ipAddressServer, 11000);
+            String serverIpAddress = GetLocalIPAddress();
+            ipAddressServer = IPAddress.Parse(serverIpAddress);
+            
+            try
+            {
+                Console.WriteLine("Wprowadz numer portu do nasluchu [1024, 65535]: ");
+                String portServerString = Console.ReadLine();
+                portServer = int.Parse(portServerString);
+            } catch (FormatException e)
+            {
+                Console.WriteLine(e.Message);
+            } catch (ArgumentNullException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if(portServer < 1024 || portServer > 65535)
+            {
+                throw new Exception("Port serwera moze zawierac sie tylko w przedziale [1024, 65535]");
+            }
+
+            localEndPoint = new IPEndPoint(ipAddressServer, portServer);
+
+            //Console.WriteLine(localEndPoint);
         }
 
         // the Socket must be associated with that endpoint 
@@ -91,5 +120,23 @@ namespace Serwer
             s.Close();
         }
 
+        private static string GetLocalIPAddress()
+        {
+            /*
+             * You can disregard the Ethernet adapter by its name. 
+             * As the VM Ethernet adapter is represented by a valid NIC driver, 
+             * it is fully equivalent to the physical NIC of your machine from the OS's point of view.
+             * */
+
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
     }
 }

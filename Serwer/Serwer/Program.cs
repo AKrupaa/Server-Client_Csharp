@@ -10,8 +10,8 @@ namespace Serwer
 
             Socket_server server = new Socket_server();
             server.setIPEndPointForServer();
-            server.associatedWithEndpoint();
-            server.waitingForTheConnection();
+            //server.associatedWithEndpoint();
+            //server.waitingForTheConnection();
             //server.receiveText();
         }
     }
