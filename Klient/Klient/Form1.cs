@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,7 +22,7 @@ namespace Klient
             //client.connectToRemoteDevice();
         }
 
-        private void button_Connect_Click(object sender, EventArgs e)
+        private void buttonSendFile_Click(object sender, EventArgs e)
         {
             String getIPText = textBox_IPaddress.Text;
             String getPortText = textBox_Port.Text;
@@ -44,8 +45,11 @@ namespace Klient
                 }
                 else
                 {
-                    Socket_client socketClient = new Socket_client(getIPText, getPortText);
-                    socketClient.connectToRemoteDevice();
+                    Thread newThread;
+                    Socket_client socketClient = new Socket_client();
+
+                    newThread = new Thread(() => socketClient.startClient(getIPText, getPortText));
+                    newThread.Start();
                 }
             }
             catch (Exception ex)
@@ -71,17 +75,6 @@ namespace Klient
             //Console.WriteLine(size); // <-- Shows file size in debugging mode.
             //Console.WriteLine(result); // <-- For debugging use.
             //textBox_TextToSend.Text = openFileDialog.FileName;
-        }
-
-        private void textBox_IPaddress_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button_SendText_Click(object sender, EventArgs e)
-        {
-            String textToSend = textBox_TextToSend.Text;
-            //connectToRemoteDevice();
         }
     }
 }

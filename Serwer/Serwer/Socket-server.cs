@@ -21,35 +21,44 @@ namespace Serwer
         // and then wait for a client to connect to that port. 
         // for the server
 
-        private IPAddress ipAddressServer;
-        private int portServer;
-        private IPEndPoint localEndPoint;
-        // Create a TCP/IP socket.  
-        private Socket listener;
+        //private IPAddress ipAddressServer;
+        //private int portServer;
+        //private IPEndPoint localEndPoint;
+        //// Create a TCP/IP socket.  
+        //private Socket listener;
         // Data buffer for incoming data.  
-        private byte[] bytes = new byte[1024];
+        //private byte[] bytes = new byte[1024];
 
         public Socket_server()
         {
-            setIPEndPointForServer();
-            associatedWithEndpoint();
-            waitingForTheConnection();
-            Console.WriteLine("Połączenie zakończone");
+        }
+
+        public void startServer(String portInputed)
+        {
+            try
+            {
+                setIPEndPointForServer(portInputed);
+            } catch(Exception e)
+            {
+                Console.WriteLine(e.Source + e.Message);
+            }
+            
         }
 
         // creates an IPEndPoint for a server 
         // by combining the first IP address returned by Dns for the host computer 
         // with a port number chosen from the registered port numbers range.
-        public void setIPEndPointForServer()
+        private void setIPEndPointForServer(String portInputed)
         {
+            int portServer = 0;
+            IPAddress ipAddressServer;
+            IPEndPoint localEndPoint;
             String serverIpAddress = GetLocalIPAddress();
             ipAddressServer = IPAddress.Parse(serverIpAddress);
 
             try
             {
-                Console.WriteLine("Wprowadz numer portu do nasluchu [1024, 65535]: ");
-                String portServerString = Console.ReadLine();
-                portServer = int.Parse(portServerString);
+                portServer = int.Parse(portInputed);
             }
             catch (FormatException e)
             {
@@ -68,47 +77,82 @@ namespace Serwer
             localEndPoint = new IPEndPoint(ipAddressServer, portServer);
             Console.WriteLine("Nasluchiwany jest: " + localEndPoint);
 
-            //Console.WriteLine(localEndPoint);
+
+            associatedWithEndpoint(ipAddressServer, localEndPoint);
         }
 
         // the Socket must be associated with that endpoint 
         // using the Bind method and set to listen on the endpoint using the Listen method. 
         // Bind throws an exception if the specific address and port combination is already in use.
-        public void associatedWithEndpoint()
+        private void associatedWithEndpoint(IPAddress ipAddressServer, IPEndPoint localEndPoint)
         {
-            this.listener = new Socket(this.ipAddressServer.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            listener.Bind(localEndPoint);
+            // Create a TCP/IP socket.  
+            Socket listener;
+            listener = new Socket(ipAddressServer.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                listener.Bind(localEndPoint);
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine(ex.Source + ex.Message);
+            }
+
 
             // The Listen method takes a single parameter that specifies 
             // how many pending connections to the Socket are allowed before 
             // a server busy error is returned to the connecting client. 
-            listener.Listen(100);
+            try
+            {
+                listener.Listen(100);
+            }
+            catch (SocketException se)
+            {
+                Console.WriteLine(se.Source + se.Message);
+            }
+
+
+            waitingForTheConnection(ref listener);
         }
 
         // start lisening for the connection
-        public void waitingForTheConnection()
+        private void waitingForTheConnection(ref Socket listener)
         {
-            Console.WriteLine("Waiting for a connection...");
+            //Console.WriteLine("waiting for a connection...");
             // Program is suspended while waiting for an incoming connection.  
-            Socket handler = listener.Accept();
-            String data = null;
-
-            while (true)
+            try
             {
-                int bytesRec = handler.Receive(bytes);
-                data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                if (data.IndexOf("<EOF>") > -1)
+                Socket handler = listener.Accept();
+                String data = null;
+                // Data buffer for incoming data.  
+                byte[] bytes = new byte[1024];
+
+                while (true)
                 {
-                    break;
+                    int bytesRec = handler.Receive(bytes);
+                    data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                    if (data.IndexOf("<EOF>") > -1)
+                    {
+                        break;
+                    }
                 }
+
+                Console.WriteLine("Text received : {0}", data);
+
+                // Echo the data back to the client.
+                //byte[] msg = Encoding.ASCII.GetBytes(data);
+                //handler.Send(msg);
+                //closeConnection(listener);
+                Console.WriteLine("Połączenie " + handler.LocalEndPoint + " zakończone");
+                closeConnection(handler);
+                listener.Close();
+                
+
             }
-
-            Console.WriteLine("Text received : {0}", data);
-
-            // Echo the data back to the client.
-            //byte[] msg = Encoding.ASCII.GetBytes(data);
-            //handler.Send(msg);
-            closeConnection(handler);
+            catch (InvalidOperationException ioe)
+            {
+                Console.WriteLine(ioe.Source + ioe.Message);
+            }
         }
 
         private void closeConnection(Socket s)

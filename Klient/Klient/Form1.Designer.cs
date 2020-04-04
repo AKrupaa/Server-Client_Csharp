@@ -30,10 +30,8 @@
         {
             this.textBox_IPaddress = new System.Windows.Forms.TextBox();
             this.textBox_Port = new System.Windows.Forms.TextBox();
-            this.button_Connect = new System.Windows.Forms.Button();
-            this.textBox_TextToSend = new System.Windows.Forms.TextBox();
-            this.button_SendText = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.buttonSendFile = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBox_IPaddress
@@ -42,7 +40,6 @@
             this.textBox_IPaddress.Name = "textBox_IPaddress";
             this.textBox_IPaddress.Size = new System.Drawing.Size(100, 22);
             this.textBox_IPaddress.TabIndex = 2;
-            this.textBox_IPaddress.TextChanged += new System.EventHandler(this.textBox_IPaddress_TextChanged);
             // 
             // textBox_Port
             // 
@@ -51,46 +48,26 @@
             this.textBox_Port.Size = new System.Drawing.Size(100, 22);
             this.textBox_Port.TabIndex = 3;
             // 
-            // button_Connect
-            // 
-            this.button_Connect.Location = new System.Drawing.Point(263, 32);
-            this.button_Connect.Name = "button_Connect";
-            this.button_Connect.Size = new System.Drawing.Size(75, 23);
-            this.button_Connect.TabIndex = 4;
-            this.button_Connect.Text = "Connect";
-            this.button_Connect.UseVisualStyleBackColor = true;
-            this.button_Connect.Click += new System.EventHandler(this.button_Connect_Click);
-            // 
-            // textBox_TextToSend
-            // 
-            this.textBox_TextToSend.Location = new System.Drawing.Point(51, 74);
-            this.textBox_TextToSend.Multiline = true;
-            this.textBox_TextToSend.Name = "textBox_TextToSend";
-            this.textBox_TextToSend.Size = new System.Drawing.Size(206, 107);
-            this.textBox_TextToSend.TabIndex = 5;
-            // 
-            // button_SendText
-            // 
-            this.button_SendText.Location = new System.Drawing.Point(263, 116);
-            this.button_SendText.Name = "button_SendText";
-            this.button_SendText.Size = new System.Drawing.Size(75, 23);
-            this.button_SendText.TabIndex = 6;
-            this.button_SendText.Text = "Send";
-            this.button_SendText.UseVisualStyleBackColor = true;
-            this.button_SendText.Click += new System.EventHandler(this.button_SendText_Click);
-            // 
             // openFileDialog
             // 
             this.openFileDialog.FileName = "openFileDialog";
+            // 
+            // buttonSendFile
+            // 
+            this.buttonSendFile.Location = new System.Drawing.Point(263, 32);
+            this.buttonSendFile.Name = "buttonSendFile";
+            this.buttonSendFile.Size = new System.Drawing.Size(75, 23);
+            this.buttonSendFile.TabIndex = 4;
+            this.buttonSendFile.Text = "SEND";
+            this.buttonSendFile.UseVisualStyleBackColor = true;
+            this.buttonSendFile.Click += new System.EventHandler(this.buttonSendFile_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.button_SendText);
-            this.Controls.Add(this.textBox_TextToSend);
-            this.Controls.Add(this.button_Connect);
+            this.Controls.Add(this.buttonSendFile);
             this.Controls.Add(this.textBox_Port);
             this.Controls.Add(this.textBox_IPaddress);
             this.Name = "Form1";
@@ -104,10 +81,8 @@
 
         private System.Windows.Forms.TextBox textBox_IPaddress;
         private System.Windows.Forms.TextBox textBox_Port;
-        private System.Windows.Forms.Button button_Connect;
-        private System.Windows.Forms.TextBox textBox_TextToSend;
-        private System.Windows.Forms.Button button_SendText;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.Button buttonSendFile;
     }
 }
 
