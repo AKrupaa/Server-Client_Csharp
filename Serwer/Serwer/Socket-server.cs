@@ -157,6 +157,8 @@ namespace Serwer
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
                 stringNazwaPlikuZRozszerzeniem = stringNazwaPlikuZRozszerzeniem.Trim('\0');
+                
+                stringNazwaPlikuZRozszerzeniem = uniqueNameOfFile(path, stringNazwaPlikuZRozszerzeniem, 0);
 
                 FileStream fs = File.Create(path + "\\\\" + stringNazwaPlikuZRozszerzeniem);
                 fs.Write(bytesZawierajacyPlik, 0, otrzymanyRozmiar);
@@ -198,6 +200,16 @@ namespace Serwer
                 }
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+
+        private string uniqueNameOfFile(string path, string stringNazwaPlikuZRozszerzeniem, int i)
+        {
+            if(File.Exists(path + "\\\\" + stringNazwaPlikuZRozszerzeniem))
+            {
+                stringNazwaPlikuZRozszerzeniem = i + stringNazwaPlikuZRozszerzeniem;
+                return uniqueNameOfFile(path, stringNazwaPlikuZRozszerzeniem, ++i);
+            }
+            return stringNazwaPlikuZRozszerzeniem;
         }
     }
 }
